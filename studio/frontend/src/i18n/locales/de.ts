@@ -3315,7 +3315,7 @@ export const de = {
         loadError: "Die Einstellungen der Entscheidungs-API konnten nicht geladen werden.",
         sendsTo: "Anfragen gehen an {provider}.",
         connectionMissing: "Diese Verbindung gibt es nicht mehr oder sie hat keine Entscheidungsmodelle. Wähle ein anderes Modell.",
-        addConnection: "Für ein gehostetes Entscheidungsmodell füge TypeSafe, Liquid AI oder OpenRouter unter Verbindungen hinzu.",
+        addConnection: "Für ein gehostetes Entscheidungsmodell füge TypeSafe, Liquid AI, Nace oder OpenRouter unter Verbindungen hinzu.",
         openConnections: "Verbindungen öffnen",
       },
       mcp: {

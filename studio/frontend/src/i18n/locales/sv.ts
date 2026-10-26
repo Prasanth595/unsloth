@@ -3509,7 +3509,7 @@ export const sv = {
         connectionMissing:
           "Denna anslutning finns inte längre eller har inga beslutsmodeller. Välj en annan modell.",
         addConnection:
-          "Lägg till TypeSafe, Liquid AI eller OpenRouter under Anslutningar för att använda en värdbaserad beslutsmodell.",
+          "Lägg till TypeSafe, Liquid AI, Nace eller OpenRouter under Anslutningar för att använda en värdbaserad beslutsmodell.",
         openConnections: "Öppna Anslutningar",
       },
       mcp: {

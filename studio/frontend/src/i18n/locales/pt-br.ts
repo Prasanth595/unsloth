@@ -3287,7 +3287,7 @@ export const ptBR = {
         loadError: "Não foi possível carregar as configurações da API de decisões.",
         sendsTo: "As solicitações são enviadas para {provider}.",
         connectionMissing: "Esta conexão não existe mais ou não tem modelos de decisões. Escolha outro modelo.",
-        addConnection: "Para usar um modelo de decisões hospedado, adicione TypeSafe, Liquid AI ou OpenRouter em Conexões.",
+        addConnection: "Para usar um modelo de decisões hospedado, adicione TypeSafe, Liquid AI, Nace ou OpenRouter em Conexões.",
         openConnections: "Abrir Conexões",
       },
       mcp: {
