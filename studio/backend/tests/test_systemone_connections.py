@@ -680,7 +680,7 @@ def test_nace_check_asks_its_decision_endpoint(upstream):
 def test_nace_lists_its_models_without_the_aliases(upstream):
     upstream.replies[0] = httpx.Response(200, json = NACE_MODELS)
     listed = _providers_post("/providers/models", {"provider_type": "nace"})
-    assert [model["id"] for model in listed] == ["drex-v2.0", "drex-max"]
+    assert [model["id"] for model in listed] == ["drex-max", "drex-v2.0"]
     assert upstream.calls[0].url.host == "console.nace.ai"
     assert upstream.calls[0].url.path == "/v1/models"
 
