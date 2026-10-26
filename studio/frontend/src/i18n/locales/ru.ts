@@ -3284,7 +3284,7 @@ export const ru = {
         loadError: "Не удалось загрузить настройки API решений.",
         sendsTo: "Запросы отправляются в {provider}.",
         connectionMissing: "Этого подключения больше нет или в нём нет моделей решений. Выберите другую модель.",
-        addConnection: "Чтобы использовать облачную модель решений, добавьте TypeSafe, Liquid AI или OpenRouter в разделе «Подключения».",
+        addConnection: "Чтобы использовать облачную модель решений, добавьте TypeSafe, Liquid AI, Nace или OpenRouter в разделе «Подключения».",
         openConnections: "Открыть подключения",
       },
       mcp: {

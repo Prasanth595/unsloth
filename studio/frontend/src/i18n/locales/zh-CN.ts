@@ -3214,7 +3214,7 @@ export const zhCN = {
         loadError: "无法加载决策 API 设置。",
         sendsTo: "请求将发送到 {provider}。",
         connectionMissing: "此连接已不存在或没有决策模型。请选择其他模型。",
-        addConnection: "要使用托管的决策模型，请在连接中添加 TypeSafe、Liquid AI 或 OpenRouter。",
+        addConnection: "要使用托管的决策模型，请在连接中添加 TypeSafe、Liquid AI、Nace 或 OpenRouter。",
         openConnections: "打开连接",
       },
       mcp: {

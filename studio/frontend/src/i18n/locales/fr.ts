@@ -3316,7 +3316,7 @@ export const fr = {
         loadError: "Impossible de charger les réglages de l'API de décision.",
         sendsTo: "Les requêtes sont envoyées à {provider}.",
         connectionMissing: "Cette connexion n'existe plus ou n'a pas de modèle de décision. Choisissez un autre modèle.",
-        addConnection: "Pour utiliser un modèle de décision hébergé, ajoutez TypeSafe, Liquid AI ou OpenRouter dans Connexions.",
+        addConnection: "Pour utiliser un modèle de décision hébergé, ajoutez TypeSafe, Liquid AI, Nace ou OpenRouter dans Connexions.",
         openConnections: "Ouvrir Connexions",
       },
       mcp: {

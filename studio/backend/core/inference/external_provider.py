@@ -7233,6 +7233,17 @@ class ExternalProviderClient:
         )
         response.raise_for_status()
         data = response.json()
+        if self.provider_type == "nace":
+            # Nace answers {"models": [{"name", "alias_for", ...}]}: every entry decides, and an
+            # alias (drex-latest, a retired name) points at a listed model, so only the targets are offered.
+            models = data.get("models") if isinstance(data, dict) else None
+            return [
+                model["name"]
+                for model in (models if isinstance(models, list) else [])
+                if isinstance(model, dict)
+                and isinstance(model.get("name"), str)
+                and model.get("alias_for") is None
+            ]
         models = data.get("data") if isinstance(data, dict) else None
         return [
             model["id"]

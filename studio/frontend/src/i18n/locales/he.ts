@@ -3407,7 +3407,7 @@ export const he = {
         connectionMissing:
           "החיבור הזה אינו קיים עוד או שאין בו מודלי החלטות. בחר מודל אחר.",
         addConnection:
-          "כדי להשתמש במודל החלטות מתארח, הוסף את TypeSafe,‏ Liquid AI או OpenRouter ב'חיבורים'.",
+          "כדי להשתמש במודל החלטות מתארח, הוסף את TypeSafe,‏ Liquid AI,‏ Nace או OpenRouter ב'חיבורים'.",
         openConnections: "פתח את 'חיבורים'",
       },
       mcp: {

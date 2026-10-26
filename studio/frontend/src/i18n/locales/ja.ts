@@ -3240,7 +3240,7 @@ export const ja = {
         loadError: "判定 API の設定を読み込めませんでした。",
         sendsTo: "リクエストは {provider} に送信されます。",
         connectionMissing: "この接続は存在しないか、判定モデルがありません。別のモデルを選んでください。",
-        addConnection: "ホスト型の判定モデルを使うには、接続で TypeSafe、Liquid AI、OpenRouter のいずれかを追加してください。",
+        addConnection: "ホスト型の判定モデルを使うには、接続で TypeSafe、Liquid AI、Nace、OpenRouter のいずれかを追加してください。",
         openConnections: "接続を開く",
       },
       mcp: {
