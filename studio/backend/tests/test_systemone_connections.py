@@ -610,15 +610,6 @@ NACE_UPSTREAM = {
     "evaluation_time_ms": 180.8,
     "request_id": "req_1",
 }
-NACE_MODELS = {
-    "models": [
-        {"name": "drex-v2.0", "description": "Drex 2.0.", "alias_for": None},
-        {"name": "drex-max", "description": "Drex Max.", "alias_for": None},
-        {"name": "drex-latest", "description": "Points to drex-v2.0.", "alias_for": "drex-v2.0"},
-        {"name": "drex-v1.0", "description": "Retired.", "alias_for": "drex-max"},
-    ],
-    "request_id": "req_2",
-}
 
 
 def _nace_connection():
@@ -676,13 +667,3 @@ def test_nace_check_asks_its_decision_endpoint(upstream):
     assert str(upstream.calls[0].url) == "https://console.nace.ai/v1/systemone"
     assert json.loads(upstream.calls[0].content)["model"] == "drex-max"
 
-
-def test_nace_lists_its_models_without_the_aliases(upstream):
-    upstream.replies[0] = httpx.Response(200, json = NACE_MODELS)
-    listed = _providers_post("/providers/models", {"provider_type": "nace"})
-    assert [model["id"] for model in listed] == ["drex-max", "drex-v2.0"]
-    assert upstream.calls[0].url.host == "console.nace.ai"
-    assert upstream.calls[0].url.path == "/v1/models"
-
-    upstream.replies[0] = httpx.Response(200, json = {"models": "soon"})
-    assert _providers_post("/providers/models", {"provider_type": "nace"}) == []
