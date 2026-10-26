@@ -666,4 +666,3 @@ def test_nace_check_asks_its_decision_endpoint(upstream):
     assert result["success"] is True, result
     assert str(upstream.calls[0].url) == "https://console.nace.ai/v1/systemone"
     assert json.loads(upstream.calls[0].content)["model"] == "drex-max"
-
