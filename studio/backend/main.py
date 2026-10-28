@@ -430,6 +430,8 @@ from hub.utils.download_registry import (
     terminate_active_downloads as terminate_hub_downloads,
 )
 from routes.settings import router as settings_router
+from routes.claude_desktop import router as claude_desktop_router
+from routes.codex_desktop import router as codex_desktop_router
 from routes.sandbox_capability import router as sandbox_capability_router
 from routes.systemone import MCP_PATH as DECISIONS_MCP_PATH, RequireStudioAuth, decisions_mcp
 from routes.systemone import router as systemone_router
@@ -1011,6 +1013,24 @@ async def lifespan(app: FastAPI):
             + "\n"
         )
 
+    # A Claude Desktop or Codex app switch left by a Studio (or `unsloth start claude|codex --app`)
+    # that crashed is switched back now. Off the event loop: it may wait for Claude to quit.
+    def _recover_claude_desktop() -> None:
+        try:
+            from core import claude_desktop as _claude_desktop
+            _claude_desktop.recover()
+        except Exception as exc:
+            _lifespan_log.warning("Claude Desktop recovery failed: %s", exc)
+        try:
+            from core import codex_desktop as _codex_desktop
+            _codex_desktop.recover()
+        except Exception as exc:
+            _lifespan_log.warning("Codex app recovery failed: %s", exc)
+
+    threading.Thread(
+        target = _recover_claude_desktop, name = "claude-desktop-recover", daemon = True
+    ).start()
+
     # Last, so it never contends for the GIL before the socket binds.
     start_background_warm()
     _start_post_warm_thread()
@@ -1046,6 +1066,23 @@ async def lifespan(app: FastAPI):
     _invalidate_detection = getattr(_hw_module, "invalidate_detection", None)
     if _invalidate_detection is not None:
         _invalidate_detection()
+
+    # First of the slow steps: the desktop shell SIGKILLs a backend that is still shutting down after
+    # ~5 s, and a switch that doesn't finish here is only undone on the next start.
+    # Both apps at once: each may wait up to its quit timeout for its app to close.
+    from core import claude_desktop as _claude_desktop
+    from core import codex_desktop as _codex_desktop
+
+    for _app_name, _outcome in zip(
+        ("Claude Desktop", "Codex app"),
+        await asyncio.gather(
+            asyncio.to_thread(_claude_desktop.shutdown),
+            asyncio.to_thread(_codex_desktop.shutdown),
+            return_exceptions = True,
+        ),
+    ):
+        if isinstance(_outcome, BaseException):
+            _lifespan_log.warning("%s switch-back failed at shutdown: %s", _app_name, _outcome)
 
     await asyncio.to_thread(_release_api_usage_writer, _api_usage_writer_lease)
 
@@ -1898,6 +1935,8 @@ app.include_router(providers_router, prefix = "/api/providers", tags = ["provide
 app.include_router(openai_codex_auth_router, prefix = "/api/providers", tags = ["providers"])
 
 app.include_router(settings_router, prefix = "/api/settings", tags = ["settings"])
+app.include_router(claude_desktop_router, prefix = "/api/settings/claude-desktop", tags = ["settings"])
+app.include_router(codex_desktop_router, prefix = "/api/settings/codex-desktop", tags = ["settings"])
 app.include_router(sandbox_capability_router, prefix = "/api/sandbox", tags = ["sandbox"])
 app.include_router(mcp_servers_router, prefix = "/api/mcp/servers", tags = ["mcp"])
 app.include_router(skills_router, prefix = "/api/skills", tags = ["skills"])

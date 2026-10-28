@@ -432,8 +432,15 @@ export const BUDGET = {
   // 2,101,285 B transfer against 9c397197e0, Node 24, 106 -> 109 chunks). Raised by that growth.
   // Mermaid, node-forge and js-yaml load on first use: -998.5 KB raw / -260.1 KB transfer against 4e673d32e.
   // Lowered by that, so the headroom stays what it was and a regression of that size fails here.
-  transferBytes: 1_836_868,
-  rawBytes: 5_954_165,
+  // Settings > Agents > Desktop apps (the Claude Desktop and Codex Desktop cards, their model pickers, the shared
+  // context window / MTP / keep-loaded run settings, API clients and strings) add +8,089 B raw / +2,495 B transfer
+  // to the eager settings and locale chunks (6,935,466 -> 6,943,555 B raw, 2,085,390 -> 2,087,885 B transfer against
+  // 8f8eaee609, one machine and build, Node 26.8.2, unchanged at 99 chunks). Lazy-loading the cards cost more
+  // (+2.4 KB transfer, 7 extra startup chunks), so they are imported statically and the budget raised by that growth.
+  // Merged onto upstream main 913e0c2f86: main's budget plus the Desktop apps growth above (+2,495 B transfer,
+  // +8,089 B raw).
+  transferBytes: 1_839_363,
+  rawBytes: 5_962_254,
 };
 
 // Chunk count is not budgeted: splitting a page out raises it while lowering bytes.
