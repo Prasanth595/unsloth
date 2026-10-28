@@ -430,8 +430,9 @@ export const BUDGET = {
   // with startup code (chat-settings-api, sidebar-organization-keys) split into their own eager chunks, plus the
   // mount hook and store wiring: +3,074 B raw / +2,025 B transfer (6,958,762 -> 6,961,836 B raw, 2,099,260 ->
   // 2,101,285 B transfer against 9c397197e0, Node 24, 106 -> 109 chunks). Raised by that growth.
-  transferBytes: 2_103_210,
-  rawBytes: 6_976_629,
+  // The Evals tab (#12521), its strings in the eager en locale: +6,058 B raw / +1,585 B transfer. Raised by that on top of main.
+  transferBytes: 2_104_795,
+  rawBytes: 6_982_687,
 };
 
 // Chunk count is not budgeted: splitting a page out raises it while lowering bytes.
