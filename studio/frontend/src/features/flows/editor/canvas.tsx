@@ -2,15 +2,14 @@
 // Copyright 2026-present the Unsloth AI Inc. team. All rights reserved. See /studio/LICENSE.AGPL-3.0
 
 import { useNativeFileDrop } from "@/features/native-intents/use-native-file-drop";
+import { useTheme } from "@/features/settings/stores/theme-store";
 import {
   Background,
   BackgroundVariant,
   type Connection,
   ConnectionMode,
-  Controls,
   type EdgeChange,
   type FinalConnectionState,
-  MiniMap,
   type NodeChange,
   type OnConnectStartParams,
   ReactFlow,
@@ -26,10 +25,11 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { categoryColor, findPort, getSpec } from "../stores/catalog-store";
+import { findPort, getSpec } from "../stores/catalog-store";
 import { useDocStore } from "../stores/doc-store";
 import { useUiStore } from "../stores/ui-store";
 import type { FlowEdge } from "../types";
+import { CanvasControls } from "./canvas-controls";
 import { dragHasFiles } from "./canvas-rules";
 import {
   checkConnection,
@@ -73,13 +73,6 @@ function portTypeOf(edge: FlowEdge): string {
   return findPort(spec, "out", edge.source_port)?.type ?? "any";
 }
 
-function minimapColor(node: RfNode): string {
-  if (node.type !== "flowNode") return "#27272a";
-  const doc = useDocStore.getState().graph.nodes[node.id];
-  const spec = doc ? getSpec(doc.type) : undefined;
-  return spec ? categoryColor(spec.category) : "#52525b";
-}
-
 function insideRect(
   x: number,
   y: number,
@@ -119,6 +112,7 @@ function groupMembership(
 }
 
 export function FlowCanvas({ readOnly = false }: { readOnly?: boolean }) {
+  const colorMode = useTheme().resolved;
   const graph = useDocStore((s) => s.graph);
   const selectedNodes = useUiStore((s) => s.selectedNodes);
   const selectedEdges = useUiStore((s) => s.selectedEdges);
@@ -481,30 +475,19 @@ export function FlowCanvas({ readOnly = false }: { readOnly?: boolean }) {
         onlyRenderVisibleElements={nodes.length > VISIBLE_ONLY_THRESHOLD}
         nodesDraggable={!readOnly}
         nodesConnectable={!readOnly}
-        colorMode="dark"
+        colorMode={colorMode}
         proOptions={PRO_OPTIONS}
         fitView={true}
         fitViewOptions={FIT_VIEW_OPTIONS}
-        className="flows-canvas bg-zinc-950"
+        className="flows-canvas bg-background"
       >
         <Background
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1.2}
-          color="#3f3f46"
+          color="color-mix(in oklab, var(--foreground) 28%, transparent)"
         />
-        <MiniMap
-          pannable={true}
-          zoomable={true}
-          nodeColor={minimapColor}
-          nodeStrokeWidth={0}
-          maskColor="rgba(9,9,11,0.7)"
-          className="!rounded-lg !border !border-white/10 !bg-zinc-900"
-        />
-        <Controls
-          showInteractive={false}
-          className="!rounded-lg !border !border-white/10 !shadow-none"
-        />
+        <CanvasControls readOnly={readOnly} />
         <SelectedNodeToolbar readOnly={readOnly} />
       </ReactFlow>
     </div>

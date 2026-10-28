@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Copyright 2026-present the Unsloth AI Inc. team. All rights reserved. See /studio/LICENSE.AGPL-3.0
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useReactFlow } from "@xyflow/react";
 import { memo, useState } from "react";
@@ -25,7 +27,6 @@ import {
   PlayIcon,
   Redo02Icon,
   Share08Icon,
-  SidebarLeftIcon,
   StickyNote01Icon,
   StopIcon,
   Undo02Icon,
@@ -49,28 +50,32 @@ function IconButton({
   onClick,
   disabled,
   active,
+  outline,
 }: {
   icon: typeof PlayIcon;
   label: string;
   onClick: () => void;
   disabled?: boolean;
   active?: boolean;
+  outline?: boolean;
 }) {
   return (
-    <button
+    <Button
       type="button"
+      variant={outline ? "outline" : "ghost"}
+      size="icon-sm"
       aria-label={label}
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className={`rounded-md p-1.5 transition-colors disabled:opacity-35 ${
+      className={
         active
-          ? "bg-white/10 text-white"
-          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
-      }`}
+          ? "bg-background text-foreground shadow-sm"
+          : "text-muted-foreground"
+      }
     >
       <HugeiconsIcon icon={icon} size={16} strokeWidth={1.8} />
-    </button>
+    </Button>
   );
 }
 
@@ -91,7 +96,6 @@ function ToolbarImpl({
   const canRedo = useDocStore((s) => s.future.length > 0);
   const saveState = useUiStore((s) => s.saveState);
   const snap = useUiStore((s) => s.snapToGrid);
-  const paletteOpen = useUiStore((s) => s.paletteOpen);
   const runStatus = useRuntimeStore((s) => s.runStatus);
   const running =
     runStatus === "running" ||
@@ -101,158 +105,176 @@ function ToolbarImpl({
   const [dialog, setDialog] = useState<"run" | "plan" | "share" | null>(null);
 
   return (
-    <div className="flex h-12 shrink-0 items-center gap-1 border-white/10 border-b bg-zinc-950 px-2 text-zinc-100">
-      <IconButton icon={ArrowLeft01Icon} label="All flows" onClick={onBack} />
-      <IconButton
-        icon={SidebarLeftIcon}
-        label="Toggle node palette"
-        onClick={() => useUiStore.getState().togglePalette()}
-        active={paletteOpen}
-      />
-      <input
-        value={name}
-        onChange={(e) =>
-          useDocStore.getState().setMeta({ name: e.target.value }, "meta:name")
-        }
-        onBlur={(e) => {
-          if (!e.target.value.trim())
-            useDocStore.getState().setMeta({ name: "Untitled flow" });
-        }}
-        className="ml-1 w-[min(320px,30vw)] rounded-md bg-transparent px-2 py-1 font-semibold text-[14px] outline-none hover:bg-white/5 focus:bg-white/5"
-        aria-label="Flow name"
-        data-testid="flows-name"
-      />
-      <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10.5px] capitalize text-zinc-400">
-        {kind}
-      </span>
-      <span
-        className={`ml-1 text-[11px] ${saveState === "error" || saveState === "conflict" ? "text-red-300" : "text-zinc-500"}`}
-        data-testid="flows-save-state"
-      >
-        {SAVE_LABEL[saveState]}
-      </span>
+    <div className="grid h-12 shrink-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 border-border border-b bg-background px-2 text-foreground">
+      <div className="flex min-w-0 items-center gap-2">
+        <IconButton icon={ArrowLeft01Icon} label="All flows" onClick={onBack} />
+        {/* Sized to the name: the hidden copy sets the width, the input fills it. */}
+        <div className="inline-grid min-w-0 max-w-[min(22rem,50vw)] font-semibold text-sm">
+          <span
+            aria-hidden={true}
+            className="invisible col-start-1 row-start-1 truncate whitespace-pre border border-transparent px-2"
+          >
+            {name || " "}
+          </span>
+          <input
+            value={name}
+            onChange={(e) =>
+              useDocStore
+                .getState()
+                .setMeta({ name: e.target.value }, "meta:name")
+            }
+            onBlur={(e) => {
+              if (!e.target.value.trim())
+                useDocStore.getState().setMeta({ name: "Untitled flow" });
+            }}
+            className="col-start-1 row-start-1 h-7 w-full min-w-0 truncate rounded-md border border-transparent bg-transparent px-2 text-foreground outline-none transition hover:border-border focus-visible:border-ring"
+            aria-label="Flow name"
+            data-testid="flows-name"
+          />
+        </div>
+        <Badge
+          variant="secondary"
+          className="h-6 shrink-0 text-ui-10 capitalize"
+        >
+          {kind}
+        </Badge>
+        <span
+          className={`shrink-0 text-xs ${saveState === "error" || saveState === "conflict" ? "text-destructive" : "text-muted-foreground"}`}
+          data-testid="flows-save-state"
+        >
+          {SAVE_LABEL[saveState]}
+        </span>
+      </div>
 
-      <div className="mx-2 h-5 w-px bg-white/10" />
-      <IconButton
-        icon={Undo02Icon}
-        label="Undo (Ctrl+Z)"
-        onClick={() => useDocStore.getState().undo()}
-        disabled={!canUndo}
-      />
-      <IconButton
-        icon={Redo02Icon}
-        label="Redo (Ctrl+Shift+Z)"
-        onClick={() => useDocStore.getState().redo()}
-        disabled={!canRedo}
-      />
-      <IconButton
-        icon={MagnetIcon}
-        label="Snap to grid"
-        onClick={() => useUiStore.getState().toggleSnap()}
-        active={snap}
-      />
-      <IconButton
-        icon={HierarchySquare02Icon}
-        label="Tidy up layout"
-        onClick={() => {
-          void autoLayout(getInternalNode, kind === "story" ? "LR" : "LR")
-            .then(() =>
-              setTimeout(
-                () => void fitView({ padding: 0.2, duration: 300 }),
-                50,
-              ),
-            )
-            .catch(() => toast.error("Layout failed"));
-        }}
-      />
-      <IconButton
-        icon={GridViewIcon}
-        label="Group selection (Shift+G)"
-        onClick={() => {
-          const vp = getViewport();
-          groupSelection([
-            -vp.x / vp.zoom + 80,
-            -vp.y / vp.zoom + 80,
-            520,
-            340,
-          ]);
-        }}
-      />
-      <IconButton
-        icon={StickyNote01Icon}
-        label="Add note"
-        onClick={() => {
-          const vp = getViewport();
-          useDocStore.getState().upsertNote({
-            id: newId("note"),
-            text: "",
-            rect: [
-              Math.round(-vp.x / vp.zoom + 120),
-              Math.round(-vp.y / vp.zoom + 120),
-              240,
-              140,
-            ],
-          });
-        }}
-      />
+      <div className="flex h-9 items-center gap-0.5 rounded-full bg-muted p-[3px]">
+        <IconButton
+          icon={Undo02Icon}
+          label="Undo (Ctrl+Z)"
+          onClick={() => useDocStore.getState().undo()}
+          disabled={!canUndo}
+        />
+        <IconButton
+          icon={Redo02Icon}
+          label="Redo (Ctrl+Shift+Z)"
+          onClick={() => useDocStore.getState().redo()}
+          disabled={!canRedo}
+        />
+        <span className="mx-1 h-4 w-px bg-border" />
+        <IconButton
+          icon={MagnetIcon}
+          label="Snap to grid"
+          onClick={() => useUiStore.getState().toggleSnap()}
+          active={snap}
+        />
+        <IconButton
+          icon={HierarchySquare02Icon}
+          label="Tidy up layout"
+          onClick={() => {
+            void autoLayout(getInternalNode, kind === "story" ? "LR" : "LR")
+              .then(() =>
+                setTimeout(
+                  () => void fitView({ padding: 0.2, duration: 300 }),
+                  50,
+                ),
+              )
+              .catch(() => toast.error("Layout failed"));
+          }}
+        />
+        <IconButton
+          icon={GridViewIcon}
+          label="Group selection (Shift+G)"
+          onClick={() => {
+            const vp = getViewport();
+            groupSelection([
+              -vp.x / vp.zoom + 80,
+              -vp.y / vp.zoom + 80,
+              520,
+              340,
+            ]);
+          }}
+        />
+        <IconButton
+          icon={StickyNote01Icon}
+          label="Add note"
+          onClick={() => {
+            const vp = getViewport();
+            useDocStore.getState().upsertNote({
+              id: newId("note"),
+              text: "",
+              rect: [
+                Math.round(-vp.x / vp.zoom + 120),
+                Math.round(-vp.y / vp.zoom + 120),
+                240,
+                140,
+              ],
+            });
+          }}
+        />
+      </div>
 
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="flex items-center justify-self-end gap-2">
         <IconButton
           icon={InformationCircleIcon}
           label="What this flow needs"
           onClick={() => setDialog("plan")}
+          outline={true}
         />
         <IconButton
           icon={Share08Icon}
           label="Share"
+          outline={true}
           onClick={() =>
             void flushSave().then((saved) => saved && setDialog("share"))
           }
         />
         {onApp && kind === "pipeline" && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={onApp}
-            className="flex items-center gap-1.5 rounded-md border border-white/15 px-2.5 py-1.5 text-[12.5px] text-zinc-200 hover:bg-white/10"
             title="Open this flow as a simple form with its results"
             data-testid="flows-open-app"
           >
             <HugeiconsIcon icon={GridViewIcon} size={15} /> Open as app
-          </button>
+          </Button>
         )}
         {(kind === "story" || kind === "world" || playsChat) && (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={onPlay}
-            className="flex items-center gap-1.5 rounded-md border border-violet-400/40 bg-violet-500/15 px-2.5 py-1.5 text-[12.5px] text-violet-100 hover:bg-violet-500/25"
             data-testid="flows-play"
           >
             <HugeiconsIcon icon={GameController01Icon} size={15} /> Play
-          </button>
+          </Button>
         )}
         {running ? (
-          <button
+          <Button
             type="button"
+            variant="destructive"
+            size="sm"
             onClick={() => void stopFlow()}
             disabled={runStatus === "cancelling"}
-            className="flex items-center gap-1.5 rounded-md bg-red-600/90 px-3 py-1.5 text-[12.5px] font-medium hover:bg-red-500 disabled:opacity-60"
             data-testid="flows-stop"
           >
             <HugeiconsIcon icon={StopIcon} size={14} />{" "}
             {runStatus === "cancelling" ? "Stopping…" : "Stop"}
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
+            variant="dark"
+            size="sm"
             onClick={() =>
               collectFlowParams().length ? setDialog("run") : void runFlow()
             }
-            className="flex items-center gap-1.5 rounded-md bg-sky-600 px-3 py-1.5 text-[12.5px] font-medium hover:bg-sky-500"
             title="Run (Ctrl+Enter)"
             data-testid="flows-run"
           >
             <HugeiconsIcon icon={PlayIcon} size={14} /> Run
-          </button>
+          </Button>
         )}
       </div>
       <RunDialog
