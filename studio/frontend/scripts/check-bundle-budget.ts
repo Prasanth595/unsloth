@@ -430,8 +430,17 @@ export const BUDGET = {
   // with startup code (chat-settings-api, sidebar-organization-keys) split into their own eager chunks, plus the
   // mount hook and store wiring: +3,074 B raw / +2,025 B transfer (6,958,762 -> 6,961,836 B raw, 2,099,260 ->
   // 2,101,285 B transfer against 9c397197e0, Node 24, 106 -> 109 chunks). Raised by that growth.
-  transferBytes: 2_103_210,
-  rawBytes: 6_976_629,
+  // DPO, ORPO and GRPO in Studio (#12601): +29,510 B raw / +9,218 B transfer over main's budget at the e3d92b48e
+  // merge (the RL strings in the eager catalog, the RL settings and role mapping in the eager training store),
+  // carried onto main's budget at each later merge of main.
+  // Python rewards (#12995): +4,260 B raw / +1,341 B transfer over #12601 (the isolation switch, Start
+  // gating and per-reward Try it errors in the eager rewards section and catalog), measured at 2fe7715056.
+  // Sample answers (#12999): +1,158 B raw / +347 B transfer over #12995 (the card's loading, waiting
+  // and error strings in the eager catalog), measured at 7eb8c86831.
+  // Format warm-up (#13000): +1,797 B raw / +590 B transfer over #12999 (the reasoning-format switch,
+  // warm-up row and their strings in the eager prompt section and catalog), measured at 93c5927c2c.
+  transferBytes: 2_114_706,
+  rawBytes: 7_013_354,
 };
 
 // Chunk count is not budgeted: splitting a page out raises it while lowering bytes.
