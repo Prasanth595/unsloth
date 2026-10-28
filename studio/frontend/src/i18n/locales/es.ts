@@ -3458,6 +3458,8 @@ export const es = {
   },
   studio: {
     goToLibrary: "Ir a la Biblioteca",
+    imageTraining: "Entrenamiento de imagen",
+    goToImageTraining: "Entrenar LoRA de imagen",
     routeTitle: "Entrenar",
     wizard: {
       modelTitle: "Modelo",

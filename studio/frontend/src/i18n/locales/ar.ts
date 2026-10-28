@@ -3414,6 +3414,8 @@ export const ar = {
   },
   studio: {
     goToLibrary: "الانتقال إلى المكتبة",
+    imageTraining: "تدريب الصور",
+    goToImageTraining: "تدريب LoRA للصور",
     routeTitle: "تدريب",
     wizard: {
       modelTitle: "النموذج",
