@@ -4085,6 +4085,12 @@ export function ModelConfigPage({
             <div className="mt-1.5 truncate text-ui-14 font-semibold leading-tight text-foreground">
               {target.displayName}
             </div>
+            <div
+              className="mt-1 truncate text-ui-11 leading-tight text-muted-foreground"
+              aria-live="polite"
+            >
+              {saveStatus || "\u00a0"}
+            </div>
           </div>
         </div>
       )}
@@ -4404,7 +4410,7 @@ export function ModelConfigPage({
             }
             onClick={() => pickSet(pinnedSet)}
           >
-            Reset
+            Reset all
           </Button>
           {target.isGguf && (
             <SharedRunConfigControls
